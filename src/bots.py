@@ -26,7 +26,7 @@ class BotBase(abc.ABC):
 
         pathlib.Path(self.log_dir).touch(exist_ok=True)
 
-    def get_new_submissions_containing_regex(self,
+    def get_hot_submissions_containing_regex(self,
                                              subreddit_name: str,
                                              regex: str,
                                              submission_limit=5) -> list:
