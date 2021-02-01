@@ -4,7 +4,7 @@ from typing import Final
 
 
 class BotHmm:
-    def __init__(self, config_name="botHmm", log_dir="./logs/" + date.today().strftime("%m/%d/%y")):
+    def __init__(self, config_name="botHmm", log_dir="../logs/" + date.today().strftime("%m/%d/%y")):
         self.reddit = praw.Reddit(config_name)
         self.log_dir = log_dir
         self.username: Final = self.reddit.user.me()
