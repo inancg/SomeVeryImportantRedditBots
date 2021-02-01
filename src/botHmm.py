@@ -1,6 +1,10 @@
-import praw, re, pathlib, random
 from datetime import date
 from typing import Final
+
+import pathlib
+import praw
+import random
+import re
 
 
 class BotHmm:
