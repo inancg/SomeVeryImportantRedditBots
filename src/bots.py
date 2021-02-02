@@ -41,7 +41,7 @@ class BotBase(abc.ABC):
     def reply_to_submission(self, submission, message: str):
         time_now = datetime.now().strftime("%H:%M:%S.%f")
         # TODO submit reply, if not commented already
-        if not self.does_item_exist_in_logs(submission.id):  # already replied
+        if not self.does_item_exist_in_logs(submission.id):  # not replied yet
             self.document_submitted_reply(submission.id,
                                           time_now,
                                           message)
@@ -49,7 +49,8 @@ class BotBase(abc.ABC):
     def reply_to_comment(self, comment, message: str):
         time_now = datetime.now().strftime("%H:%M:%S.%f")
         # TODO submit reply, if not commented already
-        if not self.does_item_exist_in_logs(comment.id):  # already replied
+        if not self.does_item_exist_in_logs(comment.id):  # not replied yet
+            print("replying to comment", comment.body)
             self.document_submitted_reply(comment.id,
                                           time_now,
                                           message)
@@ -102,10 +103,19 @@ class KnightBot(BotBase):
         return "*Sir " + message
 
     def get_unknighted_name(self, message):
-        # TODO handle if the knighted name is used : Sir + _KNIGHT_NAMES[x]
-        match_obj = re.search("|".join(self._KNIGHT_NAMES),
+        knight_names_re = "|".join(self._KNIGHT_NAMES)
+
+        match_obj = re.search(knight_names_re,
                               message,
                               re.IGNORECASE)
-        if match_obj:
-            print("here is the message", message)
+
+        does_include_sir = re.search(
+            r"sir\s+({})".format(knight_names_re),
+            message,
+            re.IGNORECASE)
+
+        if does_include_sir: # TODO delete
+            print("includes sir ", message)
+
+        if match_obj and not does_include_sir:
             return match_obj.group()
