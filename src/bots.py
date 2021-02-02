@@ -91,6 +91,7 @@ class KnightBot(BotBase):
         return "*Sir " + message
 
     def get_unknighted_name(self, message):
+        # TODO handle if the knighted name is used : Sir + _KNIGHT_NAMES[x]
         match_obj = re.search("|".join(self._KNIGHT_NAMES),
                               message,
                               re.IGNORECASE)
