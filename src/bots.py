@@ -40,8 +40,15 @@ class BotBase(abc.ABC):
 
     def reply_to_submission(self, submission, message: str):
         time_now = datetime.now().strftime("%H:%M:%S.%f")
-        # TODO submit reply
+        # TODO submit reply, if not commented already
         self.document_submitted_reply(submission.id,
+                                      time_now,
+                                      message)
+
+    def reply_to_comment(self, comment, message: str):
+        time_now = datetime.now().strftime("%H:%M:%S.%f")
+        # TODO submit reply, if not commented already
+        self.document_submitted_reply(comment.id,
                                       time_now,
                                       message)
 
@@ -55,7 +62,7 @@ class BotBase(abc.ABC):
                                         message))
 
     @abc.abstractmethod
-    def generate_message(self) -> str:
+    def generate_message(self, message: str) -> str:
         return "Shouldn't reach here"
 
 
@@ -66,6 +73,27 @@ class HmmBot(BotBase):
                          + date.today().strftime("%y-%m-%d")):
         super().__init__(config_name, log_dir)
 
-    def generate_message(self) -> str:
+    def generate_message(self, message=None) -> str:
         # TODO design message logic
         return "h" + "m" * random.randint(2, 10)
+
+
+class KnightBot(BotBase):
+    _KNIGHT_NAMES = ["lewis", "hamilton"]
+
+    def __init__(self,
+                 config_name="botHmm",
+                 log_dir="../logs/mannersBot_"
+                         + date.today().strftime("%y-%m-%d")):
+        super().__init__(config_name, log_dir)
+
+    def generate_message(self, message: str) -> str:
+        return "*Sir " + message
+
+    def get_unknighted_name(self, message):
+        match_obj = re.search("|".join(self._KNIGHT_NAMES),
+                              message,
+                              re.IGNORECASE)
+        if match_obj:
+            print("here is the message", message)
+            return match_obj.group()
