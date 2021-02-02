@@ -41,16 +41,18 @@ class BotBase(abc.ABC):
     def reply_to_submission(self, submission, message: str):
         time_now = datetime.now().strftime("%H:%M:%S.%f")
         # TODO submit reply, if not commented already
-        self.document_submitted_reply(submission.id,
-                                      time_now,
-                                      message)
+        if not self.does_item_exist_in_logs(submission.id):  # already replied
+            self.document_submitted_reply(submission.id,
+                                          time_now,
+                                          message)
 
     def reply_to_comment(self, comment, message: str):
         time_now = datetime.now().strftime("%H:%M:%S.%f")
         # TODO submit reply, if not commented already
-        self.document_submitted_reply(comment.id,
-                                      time_now,
-                                      message)
+        if not self.does_item_exist_in_logs(comment.id):  # already replied
+            self.document_submitted_reply(comment.id,
+                                          time_now,
+                                          message)
 
     def document_submitted_reply(self,
                                  submission_id: str,
@@ -60,6 +62,15 @@ class BotBase(abc.ABC):
             f.write("{}-{}-{}\n".format(submission_id,
                                         timestamp,
                                         message))
+
+    def does_item_exist_in_logs(self, item_id):
+        with open(self.log_dir, "r") as f:
+            for line in f.readlines():
+                logged_item_id = line.split("-")[0]
+                if item_id == logged_item_id:
+                    print("Already replied to", item_id)
+                    return True
+        return False
 
     @abc.abstractmethod
     def generate_message(self, message: str) -> str:
