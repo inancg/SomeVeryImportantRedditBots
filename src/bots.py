@@ -60,7 +60,8 @@ class BotBase(abc.ABC):
         if not self.does_item_exist_in_logs(submission.id):  # not replied yet
             try:
                 submission.reply(message)
-                print("replied to submission", submission.body)
+                print("\n*******\nreplied to submission\n*******\n",
+                      submission.title)
                 self.document_submitted_reply(submission.id,
                                               time_now,
                                               message)
@@ -77,7 +78,7 @@ class BotBase(abc.ABC):
         if not self.does_item_exist_in_logs(comment.id):  # not replied yet
             try:
                 comment.reply(message)
-                print("replied to comment", comment.body)
+                print("\n*******\nreplied to comment\n*******\n", comment.body)
                 self.document_submitted_reply(comment.id,
                                               time_now,
                                               message)

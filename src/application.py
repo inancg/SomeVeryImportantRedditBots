@@ -33,7 +33,7 @@ def run_knight_bot():
 
     # TODO repetitive code, create new function
     for submission in submission_list:
-        unknighted_name = knight_bot.get_unknighted_name(submission.body)
+        unknighted_name = knight_bot.get_unknighted_name(submission.title)
         if unknighted_name:
             knighted_name = knight_bot.generate_message(unknighted_name)
             knight_bot.reply_to_submission(submission=submission,
