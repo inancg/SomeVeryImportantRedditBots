@@ -10,12 +10,14 @@ HmmBot:
 
 from datetime import date, datetime
 from typing import Final
+from praw import exceptions
 
 import pathlib
 import praw
 import random
 import re
 import abc
+import sys
 
 
 class BotBase(abc.ABC):
@@ -48,12 +50,19 @@ class BotBase(abc.ABC):
 
     def reply_to_comment(self, comment, message: str):
         time_now = datetime.now().strftime("%H:%M:%S.%f")
-        # TODO submit reply, if not commented already
+
         if not self.does_item_exist_in_logs(comment.id):  # not replied yet
-            print("replying to comment", comment.body)
-            self.document_submitted_reply(comment.id,
-                                          time_now,
-                                          message)
+            try:
+                comment.reply(message)
+                print("replied to comment", comment.body)
+                self.document_submitted_reply(comment.id,
+                                              time_now,
+                                              message)
+            except praw.exceptions.RedditAPIException as e:
+                print("Error message:", e.message)
+
+                # TODO: gracefully exit (implemented now) or sleep
+                sys.exit("API Limit reached, will stop execution")
 
     def document_submitted_reply(self,
                                  submission_id: str,
@@ -94,8 +103,8 @@ class KnightBot(BotBase):
     _KNIGHT_NAMES = ["lewis", "hamilton"]
 
     def __init__(self,
-                 config_name="botHmm",
-                 log_dir="../logs/mannersBot_"
+                 config_name="knightBot",
+                 log_dir="../logs/knightBot_"
                          + date.today().strftime("%y-%m-%d")):
         super().__init__(config_name, log_dir)
 
@@ -114,7 +123,7 @@ class KnightBot(BotBase):
             message,
             re.IGNORECASE)
 
-        if does_include_sir: # TODO delete
+        if does_include_sir:  # TODO delete
             print("includes sir ", message)
 
         if match_obj and not does_include_sir:
