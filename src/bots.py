@@ -8,7 +8,7 @@ HmmBot:
     - logs the
 """
 
-from datetime import date, datetime
+from datetime import datetime
 from typing import Final
 from praw import exceptions
 
@@ -18,6 +18,7 @@ import random
 import re
 import abc
 import sys
+import ray
 
 
 class BotBase(abc.ABC):
@@ -150,3 +151,45 @@ class KnightBot(BotBase):
 
         if match_obj and not does_include_sir:
             return match_obj.group()
+
+    @ray.remote
+    def knight_comments(self, subreddit_name: str):
+        print("knighting comments\n\n\n\n\n")
+        for comment in self.reddit.subreddit(subreddit_name) \
+                .stream.comments():
+            print(comment.body)
+            unknighted_name = self.get_unknighted_name(comment.body)
+            if unknighted_name:
+                knighted_name = self.generate_message(unknighted_name)
+                self.reply_to_comment(comment=comment,
+                                      message=knighted_name)
+
+    @ray.remote
+    def knight_submissions(self, subreddit_name: str):
+        print("knighting submissions\n\n\n\n\n")
+        for submission in self.reddit.subreddit(subreddit_name) \
+                .stream.submissions():
+            print(submission.title)
+            unknighted_name = self.get_unknighted_name(submission.title)
+            if unknighted_name:
+                knighted_name = self.generate_message(unknighted_name)
+                self.reply_to_submission(submission=submission,
+                                         message=knighted_name)
+
+            if submission.selftext:
+                unknighted_name = self.get_unknighted_name(submission.selftext)
+                if unknighted_name:
+                    knighted_name = self.generate_message(unknighted_name)
+                    self.reply_to_submission(submission=submission,
+                                             message=knighted_name)
+
+    def knight_everything(self, subreddit_name: str):
+        ray.init()
+        knight_submissions_remote = self.knight_submissions\
+            .remote(self, subreddit_name=subreddit_name)
+
+        knight_comments_remote = self.knight_comments\
+            .remote(self, subreddit_name=subreddit_name)
+
+        ray.get(knight_submissions_remote)
+        ray.get(knight_comments_remote)
