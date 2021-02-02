@@ -12,7 +12,6 @@ __email__ = "inanc.gurkan@yahoo.com"
 __status__ = "Development"
 
 import bots
-import ray
 
 
 def run_hmm_bot():
@@ -28,6 +27,7 @@ def run_hmm_bot():
 def run_knight_bot():
     knight_bot = bots.KnightBot()
     knight_bot.knight_everything("formuladank")
+
 
 if __name__ == "__main__":
     run_knight_bot()
