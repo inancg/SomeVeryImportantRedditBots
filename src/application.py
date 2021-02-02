@@ -27,11 +27,18 @@ def run_hmm_bot():
 def run_knight_bot():
     knight_bot = bots.KnightBot()
     submission_list = knight_bot \
-        .get_hot_submissions_containing_regex(subreddit_name="formuladank",
+        .get_new_submissions_containing_regex(subreddit_name="formuladank",
                                               regex="",
-                                              submission_limit=15)
+                                              submission_limit=50)
 
+    # TODO repetitive code, create new function
     for submission in submission_list:
+        unknighted_name = knight_bot.get_unknighted_name(submission.body)
+        if unknighted_name:
+            knighted_name = knight_bot.generate_message(unknighted_name)
+            knight_bot.reply_to_submission(submission=submission,
+                                           message=knighted_name)
+
         for comment in submission.comments:
             unknighted_name = knight_bot.get_unknighted_name(comment.body)
             if unknighted_name:

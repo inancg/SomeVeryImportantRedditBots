@@ -40,17 +40,40 @@ class BotBase(abc.ABC):
 
         return submission_list
 
+    def get_new_submissions_containing_regex(self,
+                                             subreddit_name: str,
+                                             regex: str,
+                                             submission_limit=5) -> list:
+        submission_list = []
+        subreddit = self.reddit.subreddit(subreddit_name)
+        for submission in subreddit.new(limit=submission_limit):
+            print(submission.title)  # TODO delete
+            if re.search(regex, submission.title, re.IGNORECASE):
+                submission_list.append(submission)
+
+        return submission_list
+
     def reply_to_submission(self, submission, message: str):
         time_now = datetime.now().strftime("%H:%M:%S.%f")
-        # TODO submit reply, if not commented already
+
+        # TODO repetitive code, create new function
         if not self.does_item_exist_in_logs(submission.id):  # not replied yet
-            self.document_submitted_reply(submission.id,
-                                          time_now,
-                                          message)
+            try:
+                submission.reply(message)
+                print("replied to submission", submission.body)
+                self.document_submitted_reply(submission.id,
+                                              time_now,
+                                              message)
+            except praw.exceptions.RedditAPIException as e:
+                print("Error message:", e.message)
+
+                # TODO: gracefully exit (implemented now) or sleep
+                sys.exit("API Limit reached, will stop execution")
 
     def reply_to_comment(self, comment, message: str):
         time_now = datetime.now().strftime("%H:%M:%S.%f")
 
+        # TODO repetitive code, create new function
         if not self.does_item_exist_in_logs(comment.id):  # not replied yet
             try:
                 comment.reply(message)
@@ -90,8 +113,7 @@ class BotBase(abc.ABC):
 class HmmBot(BotBase):
     def __init__(self,
                  config_name="botHmm",
-                 log_dir="../logs/hmmBot_"
-                         + date.today().strftime("%y-%m-%d")):
+                 log_dir="../logs/hmmBot"):
         super().__init__(config_name, log_dir)
 
     def generate_message(self, message=None) -> str:
@@ -104,8 +126,7 @@ class KnightBot(BotBase):
 
     def __init__(self,
                  config_name="knightBot",
-                 log_dir="../logs/knightBot_"
-                         + date.today().strftime("%y-%m-%d")):
+                 log_dir="../logs/knightBot"):
         super().__init__(config_name, log_dir)
 
     def generate_message(self, message: str) -> str:
