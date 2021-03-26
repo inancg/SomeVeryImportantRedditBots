@@ -1,4 +1,4 @@
-# redditBotHmm
+# Some Very Important Reddit Bots
 Very important collection of bots doing some things for some subreddits
 
 # how to
